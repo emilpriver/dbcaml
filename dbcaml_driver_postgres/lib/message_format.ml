@@ -83,6 +83,8 @@ let to_string ~(format : message_format) : string =
 
 let message buf =
   let message_type =
+    if Bytes.length buf = 0 then raise (Error "empty message");
+
     match from_u8 (Bytes.get buf 0) with
     | Ok v -> v
     | Error e -> raise (Error e)

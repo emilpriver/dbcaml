@@ -97,5 +97,22 @@
   (topics "postgres" "serde" "ocaml")))
 
 (package
+ (name SerdeSqlite)
+ (synopsis "Sqlite Serde Stuff")
+ (description "Sqlite Serde Stuff")
+ (depends
+  ocaml
+  (alcotest :with-test)
+  dune
+  sqlite3
+  serde
+  silo
+  serde_json
+  serde_derive
+  yojson)
+ (tags
+  (topics "sqlite" "serde" "ocaml")))
+
+(package
   (name dbcaml-examples)
   (depends dbcaml dbcaml-driver-postgres serde riot silo))

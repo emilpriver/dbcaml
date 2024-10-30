@@ -75,6 +75,11 @@ let rec parse_response acc message =
 (* Wait for the response from database and then parse it *)
 let wait_for_response conn =
   let* (_, _message_type, _size, message) = Pg.receive conn in
+  Pg_logger.warn
+    (Format.sprintf
+       "Received message: %s with length: %d"
+       (Bytes.to_string message)
+       (Int32.to_int _size));
 
   let* messages = parse_response [] message in
 

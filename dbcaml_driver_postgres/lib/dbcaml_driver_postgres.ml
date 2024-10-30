@@ -54,6 +54,21 @@ module Postgres = struct
 
   (** Deserialize the response bytes from postgres into a type *)
   let deserialize = Serde_postgres.of_bytes
+
+  (* let get_rows_affected message = *)
+  (*   try *)
+  (*     let length = String.length message in *)
+  (*     (* Find the position of the last space, before the number of rows *) *)
+  (*     let space_pos = String.rindex message ' ' in *)
+  (*     (* Extract the number from space position to the end minus the null character *) *)
+  (*     let number_str = *)
+  (*       String.sub message (space_pos + 1) (length - space_pos - 2) *)
+  (*     in *)
+  (*     (* Convert the extracted string to an integer *) *)
+  (*     let value = int_of_string number_str in *)
+  (*     Ok value *)
+  (*   with *)
+  (*   | _ -> Error "failed to parse command complete message" *)
 end
 
 (** Create a interface which returns back a Dbcaml.Driver.t type. This type is used to create a connection and make queries *)

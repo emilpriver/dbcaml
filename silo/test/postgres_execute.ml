@@ -68,6 +68,7 @@ let test_execute_successfully () =
 
   if rows_affected == 0 then
     Alcotest.fail "update query should have returned at least 1 row affected";
+
   (* Fetch the user and return the user to a variable *)
   let rows_affected =
     match

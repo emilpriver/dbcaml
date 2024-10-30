@@ -107,7 +107,7 @@ let parse_command_complete message =
 (** Execute sends a execute command to the database and returns the amount of rows affected. Ideal to use for insert,update and delete queries  *)
 let execute ?(params = []) config ~query =
   match config with
-  | Connected { conn_mgr_pid; _ } ->
+  | Connected { conn_mgr_pid;  _ } ->
     let params =
       if List.length params > 0 then
         Some params
@@ -115,8 +115,11 @@ let execute ?(params = []) config ~query =
         None
     in
 
-    let* result = Dbcaml.raw_query conn_mgr_pid ~params ~query in
-    let* rows_affected = parse_command_complete result in
-
-    Ok rows_affected
+    (* (* Dbcaml.get_rows_affected  *) *)
+    (* let* rows_affected = parse_command_complete result in *)
+    (**)
+    (* Ok rows_affected *)
+    let* _ = Dbcaml.raw_query conn_mgr_pid ~params ~query in
+    (* Dbcaml.Driver.get_rows_affected driver result  *)
+    Ok 0
   | Ready_to_connect _ -> Error "Should be a connected config"

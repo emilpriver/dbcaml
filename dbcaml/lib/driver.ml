@@ -27,6 +27,9 @@ module type Intf = sig
     result
 
   val deserialize : 'a Serde.De.t -> bytes -> ('a, Serde.error) result
+
+  (* TODO: More of this should be extracted into the driver. Less requirements of DBCaml *)
+  (* val get_rows_affected : string -> (int, string) result *)
 end
 
 type t =
@@ -35,6 +38,10 @@ type t =
       config: 'config;
     }
       -> t
+
+(* let get_rows_affected = function *)
+(*   | Driver { driver = (module DriverModule); _ } -> *)
+(*     DriverModule.get_rows_affected *)
 
 type 'ctx state = {
   connection_manager_pid: Pid.t;

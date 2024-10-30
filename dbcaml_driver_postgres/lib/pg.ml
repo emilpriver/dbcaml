@@ -13,13 +13,13 @@ type t =
       -> t
 
 let send (Conn { writer; _ } as conn) ~buffer =
-  let message = Buffer.contents buffer in
-
-  let* () = IO.write_all writer ~buf:message in
+  let buf = Buffer.contents buffer in
+  let* () = IO.write_all writer ~buf in
   Ok conn
 
 let receive (Conn { reader; _ } as conn) =
   let* data = Bs.with_bytes (fun buf -> IO.read reader buf) in
+  Pg_logger.debug (Format.sprintf "Received %d bytes" (Bs.length data));
 
   let* (message_type, size, message) =
     Message_format.message (Bs.to_string data |> Bytes.of_string)

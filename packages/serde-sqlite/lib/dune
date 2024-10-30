@@ -1,0 +1,6 @@
+(library
+ (name SerdeSqlite)
+ (package SerdeSqlite)
+ (libraries serde serde_derive serde_json yojson sqlite3 riot dbcaml silo)
+ (preprocess (pps serde_derive)))
+
