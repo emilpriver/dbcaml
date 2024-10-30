@@ -21,11 +21,9 @@ let read_message buf =
   let size = Bytes.get_int32_be buf 1 in
   let total_message_length = (Int32.unsigned_to_int size |> Option.get) + 1 in
   let message = Bytes.sub buf 0 total_message_length in
-
   let new_buffer =
     Bytes.sub buf total_message_length (Bytes.length buf - total_message_length)
   in
-
   Ok (message, new_buffer)
 
 (* parse_response reads the message and filter which messages to keep. Some of the messages such as CloseComplete are we not

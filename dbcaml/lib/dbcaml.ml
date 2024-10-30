@@ -71,7 +71,7 @@ let raw_query ?(row_limit = 0) connection_manager_id ~params ~query =
 
   let result =
     match Connection.query ~conn:connection ~params:p ~query ~row_limit with
-    | Ok s -> Ok (Bytes.to_string s)
+    | Ok s -> Ok s
     | Error e -> Error (Res.execution_error_to_string e)
   in
 

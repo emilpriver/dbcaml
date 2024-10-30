@@ -36,8 +36,12 @@ let query ~conn ~query ~row_limit ~params =
   Buffer.add_buffer buffer sync_buffer;
 
   let* _ = Pg.send conn ~buffer in
+  (* TODO:
+     this is the place where we need to conver the value to a reader as it's time to return it to the clients but we also need to read the first
+     byte to make sure the response is OK
+  *)
   let* execute_buffer = Parse_message.wait_for_response conn in
 
   let response = Bytes.concat Bytes.empty [describe_response; execute_buffer] in
 
-  Ok response
+  Ok (Rio.Reader.of_read_src conn)
