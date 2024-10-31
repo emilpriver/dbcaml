@@ -78,21 +78,21 @@ let raw_query ?(row_limit = 0) connection_manager_id ~params ~query =
 
 let ( let* ) = Result.bind
 
-module type CONNECTION = sig
-  val connection : string -> Driver.t
+module type CONNECTOR = sig
+  val connect : string -> Driver.t
 end
 
 type config = {
-  driver: (module CONNECTION);
+  connector: (module CONNECTOR);
   connections: int;
   connection_string: string;
 }
 
 (** Create a new config based on the provided params.  *)
-let config ~connections ~driver ~connection_string =
-  { driver; connections; connection_string }
+let config ~connections ~connector ~connection_string =
+  { connector; connections; connection_string }
 
-type connection = {
+type t = {
   driver: Driver.t;
   connections: int;
   connection_string: string;
@@ -104,10 +104,10 @@ type connection = {
   This spins up a pool and creates the amount of connections provided in the config
 *)
 let connect ~(config : config) =
-  let (module D) = config.driver in
+  let (module Connector) = config.connector in
   let connections = config.connections in
   let connection_string = config.connection_string in
-  let connection = D.connection connection_string in
+  let connection = Connector.connect connection_string in
   match start_link ~connections connection with
   | Ok conn_mgr_pid ->
     Ok { driver = connection; connections; connection_string; conn_mgr_pid }
@@ -131,6 +131,4 @@ let execute ?(params = []) connection ~query =
   in
 
   let* _ = raw_query connection.conn_mgr_pid ~params ~query in
-  (* DBCaml.Driver.get_rows_affected driver result  *)
-  (* Ok 0 *)
-  failwith "IMPLEMENT ROWS AFFECTED"
+  Ok ()

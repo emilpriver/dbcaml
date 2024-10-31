@@ -97,5 +97,5 @@ module Postgres = struct
 end
 
 (** Create a interface which returns back a DBCaml.Driver.t type. This type is used to create a connection and make queries *)
-let connection conninfo =
+let connect conninfo =
   DBCaml.Driver.Driver { driver = (module Postgres); config = { conninfo } }

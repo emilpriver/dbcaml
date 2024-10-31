@@ -6,25 +6,24 @@ end)
 
 let ( let* ) = Result.bind
 
+type connection_errors =
+  [ `Closed
+  | `Connection_closed
+  | `Eof
+  | `Exn of exn
+  | `Msg of string
+  | `No_info
+  | `Noop
+  | `Process_down
+  | `Timeout
+  | `Unix_error of Unix.error
+  | `Would_block
+  ]
+
 module type DRIVER = sig
   type config
 
-  val connect :
-    config ->
-    ( Connection.t,
-      [> `Closed
-      | `Connection_closed
-      | `Eof
-      | `Exn of exn
-      | `Msg of string
-      | `No_info
-      | `Noop
-      | `Process_down
-      | `Timeout
-      | `Unix_error of Unix.error
-      | `Would_block
-      ] )
-    result
+  val connect : config -> (Connection.t, [> connection_errors ]) result
 
   val deserialize : 'a Serde.De.t -> bytes -> ('a, Serde.error) result
 

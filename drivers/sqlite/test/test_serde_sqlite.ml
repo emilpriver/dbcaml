@@ -16,8 +16,8 @@ let test_sqlite_open () =
   @@
   let config =
     DBCaml.config
+      ~connector:(module DBCamlSqlite.Connector)
       ~connections:1
-      ~driver:(module DBCamlSqlite.Driver)
       ~connection_string:"test.db"
   in
   let* db = DBCaml.connect ~config in

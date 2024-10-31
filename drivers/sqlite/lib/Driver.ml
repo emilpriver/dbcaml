@@ -37,8 +37,10 @@ module Store = struct
   let to_response (store : t) = to_string store |> Bytes.of_string |> Result.ok
 end
 
-module Driver = struct
-  type config = { conninfo: string }
+type t = { conninfo: string }
+
+module T : DBCaml.Driver.DRIVER with type config = t = struct
+  type config = t
 
   let collect_rows connection query =
     let store = Store.empty () in
@@ -88,9 +90,4 @@ module Driver = struct
   (* let get_rows_affected result = Ok (Sqlite3.changes result) *)
 end
 
-module Connection : DBCaml.CONNECTION = struct
-  let connection conninfo =
-    DBCaml.Driver.Driver { driver = (module Driver); config = { conninfo } }
-end
-
-include Connection
+include T
