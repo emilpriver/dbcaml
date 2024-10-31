@@ -71,7 +71,7 @@ let () =
         x.some_bool
         (String.concat ", " x.pets)
         (String.concat ", " (Array.to_list x.pets_array)))
-    (Option.get fetched_users);
+    fetched_users;
 
   (* Fetch the user and return the user to a variable *)
   let* fetched_users =
@@ -98,7 +98,7 @@ let () =
         x.some_bool
         (String.concat ", " x.pets)
         (String.concat ", " (Array.to_list x.pets_array)))
-    (Option.get fetched_users);
+    fetched_users;
 
   info (fun f -> f "Starting application");
   Ok 1

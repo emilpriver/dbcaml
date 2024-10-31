@@ -39,6 +39,10 @@ type t =
     }
       -> t
 
+let connect t =
+  match t with
+  | Driver { driver = (module Driver); config } -> Driver.connect config
+
 (* let get_rows_affected = function *)
 (*   | Driver { driver = (module DriverModule); _ } -> *)
 (*     DriverModule.get_rows_affected *)

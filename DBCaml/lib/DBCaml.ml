@@ -59,12 +59,7 @@ let start_link ?(connections = 10) (driver : Driver.t) =
 * It handles asking for a lock a item in the pool and releasing after query is done.
 *)
 let raw_query ?(row_limit = 0) connection_manager_id ~params ~query =
-  let p =
-    match params with
-    | Some opts -> opts
-    | None -> []
-  in
-
+  let p = Option.value ~default:[] params in
   let (holder_pid, connection) =
     match Pool.get_connection connection_manager_id with
     | Ok h -> h
@@ -83,79 +78,59 @@ let raw_query ?(row_limit = 0) connection_manager_id ~params ~query =
 
 let ( let* ) = Result.bind
 
-module type Intf = sig
+module type CONNECTION = sig
   val connection : string -> Driver.t
 end
 
-type t =
-  | Ready of {
-      driver: (module Intf);
-      connections: int;
-      connection_string: string;
-    }
-  | Connected of {
-      driver: Driver.t;
-      connections: int;
-      connection_string: string;
-      conn_mgr_pid: Riot.Pid.t;
-    }
+type config = {
+  driver: (module CONNECTION);
+  connections: int;
+  connection_string: string;
+}
 
 (** Create a new config based on the provided params.  *)
 let config ~connections ~driver ~connection_string =
-  Ready { driver; connections; connection_string }
+  { driver; connections; connection_string }
+
+type connection = {
+  driver: Driver.t;
+  connections: int;
+  connection_string: string;
+  conn_mgr_pid: Riot.Pid.t;
+}
 
 (** 
   Start a connection to the database.
   This spins up a pool and creates the amount of connections provided in the config
 *)
-let connect ~config =
-  match config with
-  | Ready { driver = (module Driver); connections; connection_string; _ } ->
-    let connection = Driver.connection connection_string in
-    (match start_link ~connections connection with
-    | Ok c ->
-      Ok
-        (Connected
-           {
-             driver = connection;
-             connections;
-             connection_string;
-             conn_mgr_pid = c;
-           })
-    | Error (`Msg error_message) -> Error error_message)
-  | Connected _ -> Error "You can't connect with a connected config"
+let connect ~(config : config) =
+  let (module D) = config.driver in
+  let connections = config.connections in
+  let connection_string = config.connection_string in
+  let connection = D.connection connection_string in
+  match start_link ~connections connection with
+  | Ok conn_mgr_pid ->
+    Ok { driver = connection; connections; connection_string; conn_mgr_pid }
+  | Error (`Msg error_message) -> Error error_message
 
 (** Query send a fetch request to the database and use the bytes to deserialize the output to a type using serde. Ideal to use for select queries *)
-let query ?params config ~query ~deserializer =
-  match config with
-  | Ready _ ->
-    (* let* self = connect ~config in *)
-    (* query self ~params ~query:(Serde.to_string query) *)
-    failwith "NOT CONNECTED YET BUT WE SHOULD DO THIS AUTOMATICALLY"
-  | Connected { conn_mgr_pid; driver; _ } ->
-    let* result = raw_query conn_mgr_pid ~params ~query in
-    let result_bytes = Bytes.of_string result in
-    begin
-      match Driver.deserialize driver deserializer result_bytes with
-      | Ok t -> Ok (Some t)
-      | Error e ->
-        Error (Format.asprintf "Deserialize error: %a" Serde.pp_err e)
-      (* | None -> Ok None) *)
-    end
+let query ?params connection ~query ~deserializer =
+  let* result = raw_query connection.conn_mgr_pid ~params ~query in
+  let result_bytes = Bytes.of_string result in
+  match Driver.deserialize connection.driver deserializer result_bytes with
+  | Ok t -> Ok t
+  | Error e -> Error (Format.asprintf "Deserialize error: %a" Serde.pp_err e)
 
 (** Execute sends a execute command to the database and returns the amount of rows affected. Ideal to use for insert,update and delete queries  *)
-let execute ?(params = []) config ~query =
-  match config with
-  | Connected { conn_mgr_pid; _ } ->
-    let params =
-      if List.length params > 0 then
-        Some params
-      else
-        None
-    in
+let execute ?(params = []) connection ~query =
+  let params =
+    if List.length params > 0 then
+      Some params
+    else
+      None
+  in
 
-    let* _ = raw_query conn_mgr_pid ~params ~query in
-    (* DBCaml.Driver.get_rows_affected driver result  *)
-    (* Ok 0 *)
-    failwith "IMPLEMENT ROWS AFFECTED"
-  | Ready _ -> Error "Should be a connected config"
+  let* _ = raw_query connection.conn_mgr_pid ~params ~query in
+  (* DBCaml.Driver.get_rows_affected driver result  *)
+  (* Ok 0 *)
+  failwith "IMPLEMENT ROWS AFFECTED"

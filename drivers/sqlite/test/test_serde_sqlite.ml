@@ -17,7 +17,7 @@ let test_sqlite_open () =
   let config =
     DBCaml.config
       ~connections:1
-      ~driver:(module DBCamlSqlite.Driver.Driver)
+      ~driver:(module DBCamlSqlite.Driver)
       ~connection_string:"test.db"
   in
   let* db = DBCaml.connect ~config in
@@ -51,7 +51,6 @@ let test_sqlite_open () =
       ~query:"SELECT * FROM users"
       ~deserializer:deserialize_users
   in
-  let rows = Option.get rows in
   (* Teej User *)
   let teej = List.find (fun user -> user.name = "teej_dv") rows in
   Alcotest.(check string) "name" "teej_dv" teej.name;
@@ -75,7 +74,6 @@ let test_sqlite_open () =
       ~query:"SELECT * FROM users WHERE name = ?"
       ~deserializer:deserialize_users
   in
-  let rows = Option.get rows in
   Alcotest.(check int) "Should only be one row" 1 (List.length rows);
   let theprimeagen = List.find (fun user -> user.name = "theprimeagen") rows in
   check_prime theprimeagen;
