@@ -107,7 +107,8 @@ let child_spec requester_pid connection_manager_pid (driver : t) =
 
   Supervisor.child_spec start_link state
 
-let deserialize driver (deserializer : 'a Serde.De.t) buf =
+let deserialize driver (deserializer : 'a Serde.De.t) buf :
+    ('a, [> Serde.error ]) result =
   match driver with
   | Driver { driver = (module D : DRIVER with type config = _); _ } ->
     D.deserialize deserializer buf

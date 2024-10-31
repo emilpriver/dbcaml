@@ -53,7 +53,7 @@ module T : DBCaml.Driver.DRIVER with type config = t = struct
     SqliteLogger.info "Conection complete";
 
     let query ~connection ~params ~query ~row_limit :
-        (Bytes.t, DBCaml.Res.execution_error) result =
+        (Bytes.t, DBCaml.Error.t) result =
       SqliteLogger.info (Format.sprintf "Querying database: %s" query);
       let _ = row_limit in
       match params with

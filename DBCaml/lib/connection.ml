@@ -13,7 +13,7 @@ type t =
         params:Params.t list ->
         query:string ->
         row_limit:int ->
-        (bytes, Res.execution_error) result;
+        (bytes, Error.t) Error.or_error;
     }
       -> t
 

@@ -38,6 +38,7 @@
   (alcotest :with-test)
   (riot
    (>= 0.0.9))
+  ppx_deriving
   serde
   uri)
  (tags

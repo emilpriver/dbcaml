@@ -4,7 +4,7 @@ open Logger.Make (struct
   let namespace = ["examples"; "basic_postgres"]
 end)
 
-let ( let* ) = Result.bind
+let ( let* ) = DBCaml.Error.bind
 
 type query_result = int [@@deriving deserialize]
 
@@ -25,7 +25,7 @@ type user = {
 type users = user list [@@deriving deserialize]
 
 let () =
-  Riot.run_with_status ~on_error:(fun x -> failwith x) @@ fun () ->
+  Riot.run_with_status ~on_error:(fun _ -> failwith "SCUFFED") @@ fun () ->
   let _ =
     match Logger.start () with
     | Error (`Msg e) -> failwith e

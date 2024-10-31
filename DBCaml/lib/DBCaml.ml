@@ -3,12 +3,13 @@ module Connection = Connection
 module Driver = Driver
 module Res = Res
 module Params = Params
+module Error = Error
 
 open Logger.Make (struct
   let namespace = ["dbcaml"]
 end)
 
-let ( let* ) = Result.bind
+let ( let* ) = Error.bind
 
 let deserialize = Driver.deserialize
 
@@ -43,14 +44,8 @@ let start_link ?(connections = 10) (driver : Driver.t) =
     List.init connections (fun _ -> Driver.child_spec (self ()) pool_id driver)
   in
 
-  let* _supervisor_pid =
-    match Supervisor.start_link ~restart_limit:10 ~child_specs () with
-    | Ok pid -> Ok pid
-    | Error _ -> Error (`Msg "Failed to start supervisor")
-  in
-
+  let* _ = Supervisor.start_link ~restart_limit:10 ~child_specs () in
   let* _ = wait_for_connections connections 0 in
-
   debug (fun f -> f "Started %d connections" connections);
 
   Ok pool_id
@@ -58,7 +53,8 @@ let start_link ?(connections = 10) (driver : Driver.t) =
 (** raw_query send a query to the database and return raw bytes.
 * It handles asking for a lock a item in the pool and releasing after query is done.
 *)
-let raw_query ?(row_limit = 0) connection_manager_id ~params ~query =
+let raw_query ?(row_limit = 0) connection_manager_id ~params ~query :
+    (string, 'a) Error.or_error =
   let p = Option.value ~default:[] params in
   let (holder_pid, connection) =
     match Pool.get_connection connection_manager_id with
@@ -67,9 +63,8 @@ let raw_query ?(row_limit = 0) connection_manager_id ~params ~query =
   in
 
   let result =
-    match Connection.query ~conn:connection ~params:p ~query ~row_limit with
-    | Ok s -> Ok (Bytes.to_string s)
-    | Error e -> Error (Res.execution_error_to_string e)
+    Connection.query ~conn:connection ~params:p ~query ~row_limit
+    |> Result.map Bytes.to_string
   in
 
   Pool.release_connection connection_manager_id ~holder_pid;
@@ -93,10 +88,10 @@ let config ~connections ~connector ~connection_string =
   { connector; connections; connection_string }
 
 type t = {
+  pid: Riot.Pid.t;
   driver: Driver.t;
   connections: int;
   connection_string: string;
-  conn_mgr_pid: Riot.Pid.t;
 }
 
 (** 
@@ -104,22 +99,18 @@ type t = {
   This spins up a pool and creates the amount of connections provided in the config
 *)
 let connect ~(config : config) =
-  let (module Connector) = config.connector in
-  let connections = config.connections in
-  let connection_string = config.connection_string in
-  let connection = Connector.connect connection_string in
-  match start_link ~connections connection with
-  | Ok conn_mgr_pid ->
-    Ok { driver = connection; connections; connection_string; conn_mgr_pid }
-  | Error (`Msg error_message) -> Error error_message
+  let { connector = (module C); connections; connection_string } = config in
+  let driver = C.connect connection_string in
+  start_link ~connections driver
+  |> Result.map (fun pid -> { driver; connections; connection_string; pid })
 
 (** Query send a fetch request to the database and use the bytes to deserialize the output to a type using serde. Ideal to use for select queries *)
 let query ?params connection ~query ~deserializer =
-  let* result = raw_query connection.conn_mgr_pid ~params ~query in
+  let* result = raw_query connection.pid ~params ~query in
   let result_bytes = Bytes.of_string result in
   match Driver.deserialize connection.driver deserializer result_bytes with
-  | Ok t -> Ok t
-  | Error e -> Error (Format.asprintf "Deserialize error: %a" Serde.pp_err e)
+  | Ok r -> Ok r
+  | Error _ -> failwith "OH NO"
 
 (** Execute sends a execute command to the database and returns the amount of rows affected. Ideal to use for insert,update and delete queries  *)
 let execute ?(params = []) connection ~query =
@@ -130,5 +121,5 @@ let execute ?(params = []) connection ~query =
       None
   in
 
-  let* _ = raw_query connection.conn_mgr_pid ~params ~query in
+  let* _ = raw_query connection.pid ~params ~query in
   Ok ()

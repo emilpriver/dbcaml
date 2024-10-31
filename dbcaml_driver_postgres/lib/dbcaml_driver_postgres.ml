@@ -66,10 +66,7 @@ module Postgres = struct
     in
 
     let query ~connection ~params ~query ~row_limit =
-      match Executer.query ~conn:connection ~query ~row_limit ~params with
-      | Ok response -> Ok response
-      | Error (`Msg e) -> Error (DBCaml.Res.ExecutionError e)
-      | Error _ -> Error (DBCaml.Res.ExecutionError "Unknown error")
+      Executer.query ~conn:connection ~query ~row_limit ~params
     in
 
     (* Create a new connection which we also want to use to create a PID *)

@@ -62,11 +62,7 @@ let test_queries () =
         match DBCaml.Connection.query ~conn ~params ~query ~row_limit:0 with
         | Ok s -> Ok (Bytes.to_string s)
         | Error e ->
-          Alcotest.fail
-            (Printf.sprintf
-               "%S : %S"
-               name
-               (DBCaml.Res.execution_error_to_string e))
+          Alcotest.fail (Printf.sprintf "%S : %S" name (DBCaml.Error.show e))
       in
       let result = Result.get_ok result in
       let first_char = result.[0] in
