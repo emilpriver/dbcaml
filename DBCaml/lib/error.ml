@@ -18,6 +18,7 @@ module ExecutionError = struct
   [@@deriving show]
 end
 
+(* KEKW leandro names it "error" but only makes pp_err.... salt my hammies *)
 module SerdeError = struct
   type t = (Serde.error[@printer Serde.pp_err]) [@@deriving show]
 end
@@ -29,12 +30,3 @@ type t =
   | `Supervisor_error
   ]
 [@@deriving show]
-
-type ('ok, 'a) or_error = ('ok, 'a) Stdlib.result constraint 'a = [< t ]
-
-let bind :
-      'a. ('a, 'b) or_error -> ('a -> ('c, 'b) or_error) -> ('c, 'b) or_error =
- fun r f ->
-  match r with
-  | Ok v -> f v
-  | Error _ as e -> e

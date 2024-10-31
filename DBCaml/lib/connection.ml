@@ -5,15 +5,13 @@
 
 type t =
   | C : {
-      (* 'conn is a generic *)
       conn: 'conn;
-      (* This function takes a 'generic conn and a query. And return a Row.T list which is our type of a row *)
       query:
         connection:'conn ->
         params:Params.t list ->
         query:string ->
         row_limit:int ->
-        (bytes, Error.t) Error.or_error;
+        (bytes, Error.t) result;
     }
       -> t
 

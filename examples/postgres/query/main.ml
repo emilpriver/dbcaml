@@ -4,7 +4,7 @@ open Logger.Make (struct
   let namespace = ["examples"; "basic_postgres"]
 end)
 
-let ( let* ) = DBCaml.Error.bind
+let ( let* ) = Stdlib.Result.bind
 
 type query_result = int [@@deriving deserialize]
 
