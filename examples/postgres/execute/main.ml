@@ -1,4 +1,5 @@
 open Riot
+module Params = Dbcaml.Params
 
 open Logger.Make (struct
   let namespace = ["examples"; "basic_postgres"]
@@ -15,29 +16,29 @@ let () =
   (* Start the database connection pool *)
   let* db =
     let config =
-      Silo.config
+      Dbcaml.config
         ~connections:5
         ~driver:(module Dbcaml_driver_postgres)
         ~connection_string:
           "postgresql://postgres:postgres@localhost:6432/postgres?sslmode=disable"
     in
 
-    Silo.connect ~config
+    Dbcaml.connect ~config
   in
 
   (* Fetch the user and return the user to a variable *)
   let* rows_affected =
-    Silo.execute
+    Dbcaml.execute
       db
       ~params:
         [
-          Silo.string "Emil";
-          Silo.bool true;
-          Silo.string "Danza";
-          Silo.number 1;
-          Silo.number 1;
-          Silo.float 1.1;
-          Silo.string_list ["Danza"];
+          Dbcaml.Params.string "Emil";
+          Dbcaml.Params.bool true;
+          Dbcaml.Params.string "Danza";
+          Dbcaml.Params.number 1;
+          Dbcaml.Params.number 1;
+          Dbcaml.Params.float 1.1;
+          Dbcaml.Params.string_list ["Danza"];
         ]
       ~query:
         "insert into users (name, some_bool, pet_name, some_int64, some_int32, some_float, pets) values ($1, $2, $3, $4, $5, $6, $7)"
@@ -47,9 +48,9 @@ let () =
 
   (* Fetch the user and return the user to a variable *)
   let* rows_affected =
-    Silo.execute
+    Dbcaml.execute
       db
-      ~params:[Silo.string "Emil"; Silo.string "Lowa"]
+      ~params:[Dbcaml.Params.string "Emil"; Dbcaml.Params.string "Lowa"]
       ~query:"update users set pet_name = $2 where name = $1"
   in
 
@@ -57,9 +58,9 @@ let () =
 
   (* Fetch the user and return the user to a variable *)
   let* rows_affected =
-    Silo.execute
+    Dbcaml.execute
       db
-      ~params:[Silo.string "Emil"]
+      ~params:[Params.string "Emil"]
       ~query:"delete from users where name = $1"
   in
 

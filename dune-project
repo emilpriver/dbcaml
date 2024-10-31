@@ -1,14 +1,10 @@
 (lang dune 3.12)
 
-(name dbcaml)
+(name DBCaml)
 
 (generate_opam_files true)
-
-(source
- (github emilpriver/dbcaml))
-
+(source (github emilpriver/dbcaml))
 (authors "Emil Priver <emil@priver.dev>")
-
 (maintainers "Emil Priver <emil@priver.dev>")
 
 (license MIT)
@@ -33,7 +29,7 @@
 
 
 (package
- (name dbcaml)
+ (name DBCaml)
  (synopsis "Database toolkit for OCaml")
  (description "Database toolkit for OCaml")
  (depends
@@ -63,25 +59,10 @@
   (tls (>= 1.0.0))
   uri
   ;; Internal
-  dbcaml
+  DBCaml
   serde-postgres)
  (tags
   (topics "database" "dbcaml" "dbcaml")))
-
-(package
- (name silo)
- (synopsis "Silo")
- (description "Silo")
- (depends
-  ocaml
-  (alcotest :with-test)
-  dune
-  dbcaml
-  serde
-  serde_derive
-  serde-postgres)
- (tags
-  (topics "postgres" "ocaml")))
 
 (package
  (name serde-postgres)
@@ -97,22 +78,22 @@
   (topics "postgres" "serde" "ocaml")))
 
 (package
- (name SerdeSqlite)
- (synopsis "Sqlite Serde Stuff")
- (description "Sqlite Serde Stuff")
+ (name DBCamlSqlite)
+ (synopsis "Sqlite support for DBCaml")
+ (description "Sqlite support for DBCaml")
  (depends
   ocaml
   (alcotest :with-test)
   dune
+  DBCaml
+  riot
   sqlite3
   serde
-  silo
   serde_json
-  serde_derive
   yojson)
  (tags
   (topics "sqlite" "serde" "ocaml")))
 
 (package
   (name dbcaml-examples)
-  (depends dbcaml dbcaml-driver-postgres serde riot silo))
+  (depends DBCaml dbcaml-driver-postgres serde riot))

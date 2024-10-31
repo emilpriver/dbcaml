@@ -12,7 +12,6 @@ depends: [
   "dbcaml-driver-postgres"
   "serde"
   "riot"
-  "silo"
   "odoc" {with-doc}
 ]
 build: [

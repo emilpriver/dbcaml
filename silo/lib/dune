@@ -1,6 +1,0 @@
-(library
- (name silo)
- (public_name silo)
- (preprocess
-  (pps serde_derive))
- (libraries dbcaml))

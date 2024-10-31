@@ -1,6 +1,0 @@
-(test
- (package silo)
- (name test_suite)
- (preprocess
-  (pps serde_derive))
- (libraries silo dbcaml dbcaml-driver-postgres serde-postgres alcotest))

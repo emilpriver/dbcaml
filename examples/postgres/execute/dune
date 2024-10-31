@@ -4,4 +4,4 @@
  (name main)
  (preprocess
   (pps serde_derive))
- (libraries silo dbcaml_driver_postgres serde riot))
+ (libraries dbcaml_driver_postgres serde riot))

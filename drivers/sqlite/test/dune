@@ -1,0 +1,4 @@
+(test
+  (name test_serde_sqlite)
+  (preprocess (pps serde_derive))
+  (libraries alcotest sqlite3 serde DBCamlSqlite))
