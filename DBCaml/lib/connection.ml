@@ -11,6 +11,8 @@ type t =
         params:Params.t list ->
         query:string ->
         row_limit:int ->
+        (* TODO: This would probably be good to switch to ExecutionError.t,
+            but it seems like postgres doesn't actually do that yet *)
         (bytes, Error.t) result;
     }
       -> t
