@@ -4,7 +4,7 @@
  (libraries
   riot
   uri
-  dbcaml
+  DBCaml
   messages
   bytestring
   serde-postgres

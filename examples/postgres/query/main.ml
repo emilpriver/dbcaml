@@ -37,19 +37,19 @@ let () =
   info (fun f -> f "Starting application");
   let* db =
     let config =
-      Dbcaml.config
+      DBCaml.config
         ~connections:5
         ~driver:(module Dbcaml_driver_postgres)
         ~connection_string:
           "postgresql://postgres:postgres@localhost:6432/postgres?sslmode=disable"
     in
 
-    Dbcaml.connect ~config
+    DBCaml.connect ~config
   in
 
   (* Fetch the user and return the user to a variable *)
   let* fetched_users =
-    Dbcaml.query
+    DBCaml.query
       db
       ~query:
         "select name, id, some_bool, pet_name, some_int64, some_int32, some_float, pets, pets as pets_array from users limit 2"
@@ -75,11 +75,11 @@ let () =
 
   (* Fetch the user and return the user to a variable *)
   let* fetched_users =
-    Dbcaml.query
+    DBCaml.query
       db
       ~query:
         "select name, id, some_bool, pet_name, some_int64, some_int32, some_float, pets, pets as pets_array from users where id < $1 limit 2"
-      ~params:[Dbcaml.Params.number 3]
+      ~params:[DBCaml.Params.number 3]
       ~deserializer:deserialize_users
   in
 

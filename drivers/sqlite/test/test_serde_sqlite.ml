@@ -15,14 +15,14 @@ let test_sqlite_open () =
   Result.get_ok
   @@
   let config =
-    Dbcaml.config
+    DBCaml.config
       ~connections:1
-      ~driver:(module DBCamlSqlite.DBCaml.Driver)
+      ~driver:(module DBCamlSqlite.Driver.Driver)
       ~connection_string:"test.db"
   in
-  let* db = Dbcaml.connect ~config in
+  let* db = DBCaml.connect ~config in
   let drop = "DROP TABLE IF EXISTS users" in
-  let* _ = Dbcaml.execute db ~params:[] ~query:drop in
+  let* _ = DBCaml.execute db ~params:[] ~query:drop in
   let sql =
     "CREATE TABLE users (
       name TEXT,
@@ -30,22 +30,22 @@ let test_sqlite_open () =
       balance FLOAT
     )"
   in
-  let* _ = Dbcaml.execute db ~params:[] ~query:sql in
+  let* _ = DBCaml.execute db ~params:[] ~query:sql in
   let* _ =
-    Dbcaml.execute
+    DBCaml.execute
       db
       ~query:"INSERT INTO users (name, age, balance) VALUES (?, ?, ?)"
       ~params:[String "teej_dv"; Number 30; Float 3.14]
   in
   let* _ =
-    Dbcaml.execute
+    DBCaml.execute
       db
       ~query:"INSERT INTO users (name, age, balance) VALUES (?, ?, ?)"
       ~params:[String "theprimeagen"; Number 45; Float 4.20]
   in
 
   let* rows =
-    Dbcaml.query
+    DBCaml.query
       db
       ~params:[]
       ~query:"SELECT * FROM users"
@@ -69,7 +69,7 @@ let test_sqlite_open () =
 
   (* Now select with WHERE query *)
   let* rows =
-    Dbcaml.query
+    DBCaml.query
       db
       ~params:[String "theprimeagen"]
       ~query:"SELECT * FROM users WHERE name = ?"

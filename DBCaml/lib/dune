@@ -1,4 +1,4 @@
 (library
- (public_name dbcaml)
- (name dbcaml)
+ (public_name DBCaml)
+ (name DBCaml)
  (libraries riot serde uri))

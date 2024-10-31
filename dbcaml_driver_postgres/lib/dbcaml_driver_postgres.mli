@@ -1,1 +1,1 @@
-val connection : string -> Dbcaml.Driver.t
+val connection : string -> DBCaml.Driver.t

@@ -1,6 +1,6 @@
-open Dbcaml.Params
+open DBCaml.Params
 
-(** Get the oid for each type we implement in Dbcaml.Params *)
+(** Get the oid for each type we implement in DBCaml.Params *)
 let oid_of_type = function
   | String _ -> 1043
   | Number _ -> 23

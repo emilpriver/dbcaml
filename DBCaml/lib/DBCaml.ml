@@ -155,7 +155,7 @@ let execute ?(params = []) config ~query =
     in
 
     let* _ = raw_query conn_mgr_pid ~params ~query in
-    (* Dbcaml.Driver.get_rows_affected driver result  *)
+    (* DBCaml.Driver.get_rows_affected driver result  *)
     (* Ok 0 *)
     failwith "IMPLEMENT ROWS AFFECTED"
   | Ready _ -> Error "Should be a connected config"

@@ -2,7 +2,7 @@ let ( let* ) = Result.bind
 
 open Messages
 
-let params_to_oid (params : Dbcaml.Params.t list) =
+let params_to_oid (params : DBCaml.Params.t list) =
   List.map Oid.oid_of_type params
 
 let _base64_encode input =

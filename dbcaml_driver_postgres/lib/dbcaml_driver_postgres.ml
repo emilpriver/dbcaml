@@ -68,12 +68,12 @@ module Postgres = struct
     let query ~connection ~params ~query ~row_limit =
       match Executer.query ~conn:connection ~query ~row_limit ~params with
       | Ok response -> Ok response
-      | Error (`Msg e) -> Error (Dbcaml.Res.ExecutionError e)
-      | Error _ -> Error (Dbcaml.Res.ExecutionError "Unknown error")
+      | Error (`Msg e) -> Error (DBCaml.Res.ExecutionError e)
+      | Error _ -> Error (DBCaml.Res.ExecutionError "Unknown error")
     in
 
     (* Create a new connection which we also want to use to create a PID *)
-    let* conn = Dbcaml.Connection.make ~conn ~query () in
+    let* conn = DBCaml.Connection.make ~conn ~query () in
 
     Ok conn
 
@@ -96,6 +96,6 @@ module Postgres = struct
   (*   | _ -> Error "failed to parse command complete message" *)
 end
 
-(** Create a interface which returns back a Dbcaml.Driver.t type. This type is used to create a connection and make queries *)
+(** Create a interface which returns back a DBCaml.Driver.t type. This type is used to create a connection and make queries *)
 let connection conninfo =
-  Dbcaml.Driver.Driver { driver = (module Postgres); config = { conninfo } }
+  DBCaml.Driver.Driver { driver = (module Postgres); config = { conninfo } }

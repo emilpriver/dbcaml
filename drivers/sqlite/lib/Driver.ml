@@ -6,14 +6,14 @@ let assert_ok = function
   | rc ->
     failwith @@ Format.sprintf "SQLITE: Not OK! %s" (Sqlite3.Rc.to_string rc)
 
-let param_to_sqlite (param : Dbcaml.Params.t) : Sqlite3.Data.t =
+let param_to_sqlite (param : DBCaml.Params.t) : Sqlite3.Data.t =
   match param with
-  | Dbcaml.Params.String v -> Sqlite3.Data.TEXT v
-  | Dbcaml.Params.Number v -> Sqlite3.Data.INT (Int64.of_int v)
-  | Dbcaml.Params.Float v -> Sqlite3.Data.FLOAT v
-  | Dbcaml.Params.Bool v -> Sqlite3.Data.opt_bool (Some v)
-  | Dbcaml.Params.StringArray _ -> failwith "SQLITE: Not Supported!"
-  | Dbcaml.Params.NumberArray _ -> failwith "SQLITE: Not Supported!"
+  | DBCaml.Params.String v -> Sqlite3.Data.TEXT v
+  | DBCaml.Params.Number v -> Sqlite3.Data.INT (Int64.of_int v)
+  | DBCaml.Params.Float v -> Sqlite3.Data.FLOAT v
+  | DBCaml.Params.Bool v -> Sqlite3.Data.opt_bool (Some v)
+  | DBCaml.Params.StringArray _ -> failwith "SQLITE: Not Supported!"
+  | DBCaml.Params.NumberArray _ -> failwith "SQLITE: Not Supported!"
 
 let data_to_string (data : Sqlite3.Data.t) : string option =
   Some (Sqlite3.Data.to_string_coerce data)
@@ -53,7 +53,7 @@ module Driver = struct
       SqliteLogger.info "Conection complete";
 
       let query ~connection ~params ~query ~row_limit :
-          (Bytes.t, Dbcaml.Res.execution_error) result =
+          (Bytes.t, DBCaml.Res.execution_error) result =
         SqliteLogger.info (Format.sprintf "Querying database: %s" query);
         let _ = row_limit in
         match params with
@@ -80,7 +80,7 @@ module Driver = struct
       in
 
       (* Create a new connection which we also want to use to create a PID *)
-      let* conn = Dbcaml.Connection.make ~conn ~query () in
+      let* conn = DBCaml.Connection.make ~conn ~query () in
 
       Ok conn
 
@@ -91,7 +91,7 @@ module Driver = struct
   end
 
   let connection conninfo =
-    Dbcaml.Driver.Driver { driver = (module Connection); config = { conninfo } }
+    DBCaml.Driver.Driver { driver = (module Connection); config = { conninfo } }
 end
 
 let assert_ok rc = assert (rc = Sqlite3.Rc.OK)

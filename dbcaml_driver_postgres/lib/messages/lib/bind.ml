@@ -26,15 +26,15 @@ let encode_int8 n = Bytes.make 1 (Char.chr n)
 (* Function used to encode a param into bytes that postgres can read *)
 let encode_param param =
   match param with
-  | Dbcaml.Params.String str -> escape_sql_value str |> Bytes.of_string
-  | Dbcaml.Params.Number i -> encode_int32 (Int32.of_int i)
-  | Dbcaml.Params.Float f -> encode_int32 (Int32.bits_of_float f)
-  | Dbcaml.Params.Bool b ->
+  | DBCaml.Params.String str -> escape_sql_value str |> Bytes.of_string
+  | DBCaml.Params.Number i -> encode_int32 (Int32.of_int i)
+  | DBCaml.Params.Float f -> encode_int32 (Int32.bits_of_float f)
+  | DBCaml.Params.Bool b ->
     if b then
       encode_int8 1
     else
       encode_int8 0
-  | Dbcaml.Params.StringArray s ->
+  | DBCaml.Params.StringArray s ->
     let oid = Bytes.of_string "1015" in
     let length = List.length s in
     let header =
@@ -64,7 +64,7 @@ let encode_param param =
         s
     in
     Bytes.concat Bytes.empty [header; content]
-  | Dbcaml.Params.NumberArray s ->
+  | DBCaml.Params.NumberArray s ->
     let oid = Bytes.of_string "1007" in
     let length = List.length s in
     let header =

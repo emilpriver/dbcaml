@@ -1,5 +1,5 @@
 open Riot
-module Params = Dbcaml.Params
+module Params = DBCaml.Params
 
 open Logger.Make (struct
   let namespace = ["examples"; "basic_postgres"]
@@ -16,29 +16,29 @@ let () =
   (* Start the database connection pool *)
   let* db =
     let config =
-      Dbcaml.config
+      DBCaml.config
         ~connections:5
         ~driver:(module Dbcaml_driver_postgres)
         ~connection_string:
           "postgresql://postgres:postgres@localhost:6432/postgres?sslmode=disable"
     in
 
-    Dbcaml.connect ~config
+    DBCaml.connect ~config
   in
 
   (* Fetch the user and return the user to a variable *)
   let* rows_affected =
-    Dbcaml.execute
+    DBCaml.execute
       db
       ~params:
         [
-          Dbcaml.Params.string "Emil";
-          Dbcaml.Params.bool true;
-          Dbcaml.Params.string "Danza";
-          Dbcaml.Params.number 1;
-          Dbcaml.Params.number 1;
-          Dbcaml.Params.float 1.1;
-          Dbcaml.Params.string_list ["Danza"];
+          DBCaml.Params.string "Emil";
+          DBCaml.Params.bool true;
+          DBCaml.Params.string "Danza";
+          DBCaml.Params.number 1;
+          DBCaml.Params.number 1;
+          DBCaml.Params.float 1.1;
+          DBCaml.Params.string_list ["Danza"];
         ]
       ~query:
         "insert into users (name, some_bool, pet_name, some_int64, some_int32, some_float, pets) values ($1, $2, $3, $4, $5, $6, $7)"
@@ -48,9 +48,9 @@ let () =
 
   (* Fetch the user and return the user to a variable *)
   let* rows_affected =
-    Dbcaml.execute
+    DBCaml.execute
       db
-      ~params:[Dbcaml.Params.string "Emil"; Dbcaml.Params.string "Lowa"]
+      ~params:[DBCaml.Params.string "Emil"; DBCaml.Params.string "Lowa"]
       ~query:"update users set pet_name = $2 where name = $1"
   in
 
@@ -58,7 +58,7 @@ let () =
 
   (* Fetch the user and return the user to a variable *)
   let* rows_affected =
-    Dbcaml.execute
+    DBCaml.execute
       db
       ~params:[Params.string "Emil"]
       ~query:"delete from users where name = $1"

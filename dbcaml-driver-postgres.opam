@@ -19,7 +19,7 @@ depends: [
   "castore"
   "tls" {>= "1.0.0"}
   "uri"
-  "dbcaml"
+  "DBCaml"
   "serde-postgres"
   "odoc" {with-doc}
 ]
