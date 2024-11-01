@@ -36,8 +36,7 @@
   ocaml
   dune
   (alcotest :with-test)
-  (riot
-   (>= 0.0.9))
+  (riot (>= 0.0.9))
   ppx_deriving
   serde
   uri)
@@ -45,38 +44,24 @@
   (topics "database" "dbcaml")))
 
 (package
- (name dbcaml-driver-postgres)
+ (name DBCamlPostgres)
  (synopsis "Postgres driver for dbcaml")
  (description "Postgres driver for dbcaml")
  (depends
   ocaml
   (alcotest :with-test)
   dune
-  (riot
-   (>= 0.0.9))
+  DBCaml
   bytestring
   cryptokit
   castore
-  (tls (>= 1.0.0))
-  uri
-  ;; Internal
-  DBCaml
-  serde-postgres)
- (tags
-  (topics "database" "dbcaml" "dbcaml")))
-
-(package
- (name serde-postgres)
- (synopsis "serde-postgres")
- (description "serde-postgres")
- (depends
-  ocaml
-  (alcotest :with-test)
-  dune
   serde
-  serde_derive)
+  serde_derive
+  (riot (>= 0.0.9))
+  (tls (>= 1.0.0))
+  uri)
  (tags
-  (topics "postgres" "serde" "ocaml")))
+  (topics "database" "dbcaml" "postgres")))
 
 (package
  (name DBCamlSqlite)
@@ -97,4 +82,4 @@
 
 (package
   (name dbcaml-examples)
-  (depends DBCaml dbcaml-driver-postgres serde riot))
+  (depends DBCaml DBCamlPostgres serde riot))

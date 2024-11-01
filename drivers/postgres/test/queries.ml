@@ -40,7 +40,7 @@ let test_queries () =
   in
 
   let connection =
-    Dbcaml_driver_postgres.connect
+    DBCamlPostgres.connect
       "postgresql://postgres:postgres@localhost:6432/postgres?sslmode=disable"
   in
 
@@ -75,7 +75,7 @@ let test_queries () =
 
 let test_unsuccessful_query () =
   let connection =
-    Dbcaml_driver_postgres.connect
+    DBCamlPostgres.connect
       "postgresql://postgres:postgres@localhost:6432/postgres?sslmode=disable"
   in
 

@@ -2,7 +2,7 @@ open Alcotest
 
 let test_connection_should_fail () =
   let connection =
-    Dbcaml_driver_postgres.connect
+    DBCamlPostgres.connect
       "postgresql://postgres-i-dont-exist:postgres@localhost:1337/postgres?sslmode=disable"
   in
 

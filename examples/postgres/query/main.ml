@@ -38,7 +38,7 @@ let () =
   let* db =
     let config =
       DBCaml.config
-        ~connector:(module Dbcaml_driver_postgres)
+        ~connector:(module DBCamlPostgres)
         ~connections:5
         ~connection_string:
           "postgresql://postgres:postgres@localhost:6432/postgres?sslmode=disable"

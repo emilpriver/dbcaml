@@ -1,0 +1,5 @@
+(test
+ (name test_suite)
+ (package DBCamlPostgres)
+ (libraries alcotest DBCamlPostgres)
+ (preprocess (pps serde_derive)))

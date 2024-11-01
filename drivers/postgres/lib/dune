@@ -1,13 +1,12 @@
 (library
- (name dbcaml_driver_postgres)
- (public_name dbcaml-driver-postgres)
+ (name DBCamlPostgres)
+ (public_name DBCamlPostgres)
  (libraries
   riot
   uri
   DBCaml
   messages
   bytestring
-  serde-postgres
   str
   tls
   cryptokit

@@ -96,3 +96,5 @@ end
 (** Create a interface which returns back a DBCaml.Driver.t type. This type is used to create a connection and make queries *)
 let connect conninfo =
   DBCaml.Driver.Driver { driver = (module Postgres); config = { conninfo } }
+
+let deserialize = Serde_postgres.of_bytes

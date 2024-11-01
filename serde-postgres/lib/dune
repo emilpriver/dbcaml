@@ -1,4 +1,0 @@
-(library
- (name serde_postgres)
- (public_name serde-postgres)
- (libraries serde serde_derive))

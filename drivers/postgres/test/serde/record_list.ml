@@ -21,7 +21,7 @@ let message =
 
 let test_record_list () =
   let users =
-    match Serde_postgres.of_bytes deserialize_users message with
+    match DBCamlPostgres.deserialize deserialize_users message with
     | Ok u -> u
     | Error e -> fail (Format.asprintf "Deserialize error: %a" Serde.pp_err e)
   in

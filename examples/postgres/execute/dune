@@ -2,6 +2,6 @@
  (package dbcaml-examples)
  (public_name postgres_execute)
  (name main)
+ (libraries DBCaml DBCamlPostgres serde riot)
  (preprocess
-  (pps serde_derive))
- (libraries dbcaml_driver_postgres serde riot))
+  (pps serde_derive)))

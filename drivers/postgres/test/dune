@@ -1,0 +1,4 @@
+(test
+ (package DBCamlPostgres)
+ (name test_suite)
+ (libraries riot DBCamlPostgres messages alcotest))

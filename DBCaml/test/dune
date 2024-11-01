@@ -1,4 +1,0 @@
-(test
- (name test_dbcaml)
- (package dbcaml-driver-postgres)
- (libraries alcotest))

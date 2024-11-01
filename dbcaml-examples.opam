@@ -9,7 +9,7 @@ bug-reports: "https://github.com/emilpriver/dbcaml/issues"
 depends: [
   "dune" {>= "3.12"}
   "DBCaml"
-  "dbcaml-driver-postgres"
+  "DBCamlPostgres"
   "serde"
   "riot"
   "odoc" {with-doc}
