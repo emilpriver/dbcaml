@@ -1,9 +1,10 @@
 let ( let* ) = Result.bind
 
 open Messages
+module Params = DBCaml.Params
 
-let params_to_oid (params : DBCaml.Params.t list) =
-  List.map Oid.oid_of_type params
+let params_to_oid (params : Params.values) =
+  DBCaml.Params.map Params.Values.{ map = Oid.oid_of_type } params
 
 let _base64_encode input =
   Cryptokit.transform_string (Cryptokit.Base64.encode_compact ()) input
@@ -14,6 +15,7 @@ let query ~conn ~query ~row_limit ~params =
   let statement_id = "dbcaml_s_" ^ Nonce.random_string 20 in
   let portal_name = "dbcaml_p_" ^ Nonce.random_string 20 in
   let params_oid = params_to_oid params in
+  let _ = List.map in
   let prepare_buffer =
     Messages.Prepare.prepare ~statement_id ~params_oid ~query
   in

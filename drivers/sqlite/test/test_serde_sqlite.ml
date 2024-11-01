@@ -1,4 +1,5 @@
 open Alcotest
+module Values = DBCaml.Params.Values
 
 let ( let* ) = Result.bind
 
@@ -22,7 +23,7 @@ let test_sqlite_open () =
   in
   let* db = DBCaml.connect ~config in
   let drop = "DROP TABLE IF EXISTS users" in
-  let* _ = DBCaml.execute db ~params:[] ~query:drop in
+  let* _ = DBCaml.execute db ~query:drop in
   let sql =
     "CREATE TABLE users (
       name TEXT,
@@ -30,26 +31,23 @@ let test_sqlite_open () =
       balance FLOAT
     )"
   in
-  let* _ = DBCaml.execute db ~params:[] ~query:sql in
+  let* _ = DBCaml.execute db ~query:sql in
   let* _ =
+    let params = Values.[text "teej_dv"; integer 30; float 3.14] in
     DBCaml.execute
       db
       ~query:"INSERT INTO users (name, age, balance) VALUES (?, ?, ?)"
-      ~params:[String "teej_dv"; Number 30; Float 3.14]
+      ~params
   in
   let* _ =
     DBCaml.execute
       db
       ~query:"INSERT INTO users (name, age, balance) VALUES (?, ?, ?)"
-      ~params:[String "theprimeagen"; Number 45; Float 4.20]
+      ~params:Values.[text "theprimeagen"; integer 45; float 4.20]
   in
 
   let* rows =
-    DBCaml.query
-      db
-      ~params:[]
-      ~query:"SELECT * FROM users"
-      ~deserializer:deserialize_users
+    DBCaml.query db ~query:"SELECT * FROM users" ~deserializer:deserialize_users
   in
   (* Teej User *)
   let teej = List.find (fun user -> user.name = "teej_dv") rows in
@@ -70,7 +68,7 @@ let test_sqlite_open () =
   let* rows =
     DBCaml.query
       db
-      ~params:[String "theprimeagen"]
+      ~params:Values.[text "theprimeagen"]
       ~query:"SELECT * FROM users WHERE name = ?"
       ~deserializer:deserialize_users
   in

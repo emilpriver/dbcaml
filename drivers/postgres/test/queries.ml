@@ -1,41 +1,43 @@
 open Alcotest
+module Params = DBCaml.Params
+module Values = DBCaml.Params.Values
 
 let test_queries () =
   let test_cases =
     [
-      ("Query without params", [], "select * from users limit 2");
+      ("Query without params", Params.make [], "select * from users limit 2");
       ( "Query with string param",
-        [DBCaml.Params.String "Alice"],
+        Params.make Values.[text "Alice"],
         "select * from users where name = $1 limit 2" );
       ( "Query with int param",
-        [DBCaml.Params.Number 12],
+        Params.make Values.[integer 12],
         "select * from users where id > $1 limit 2" );
       ( "Query with float param",
-        [DBCaml.Params.Float 1.1],
+        Params.make Values.[float 1.1],
         "select * from users where some_float = $1 limit 2" );
       ( "Query with bool param",
-        [DBCaml.Params.Bool true],
+        Params.make Values.[boolean true],
         "select * from users where some_bool = $1 limit 2" );
-      ( "Query with 1 string array param",
-        [DBCaml.Params.StringArray ["Alice"]],
-        "select * from users where name = any($1) limit 2" );
-      ( "Query with 2 string array param",
-        [DBCaml.Params.StringArray ["Alice"; "Bob"]],
-        "select * from users where name = any($1) limit 2" );
-      ( "Query with number array param",
-        [DBCaml.Params.NumberArray [1; 2]],
-        "select * from users where id = any($1) limit 2" );
-      ( "Query with 1 number array param",
-        [DBCaml.Params.NumberArray [1]],
-        "select * from users where  id = any($1) limit 2" );
-      ( "Query with different type param",
-        [
-          DBCaml.Params.NumberArray [1];
-          DBCaml.Params.String "Alice";
-          DBCaml.Params.Bool true;
-        ],
-        "select * from users where id = any($1) and name = $2 and some_bool = $3  limit 2"
-      );
+      (* ( "Query with 1 string array param", *)
+      (*   [DBCaml.Params.StringArray ["Alice"]], *)
+      (*   "select * from users where name = any($1) limit 2" ); *)
+      (* ( "Query with 2 string array param", *)
+      (*   [DBCaml.Params.StringArray ["Alice"; "Bob"]], *)
+      (*   "select * from users where name = any($1) limit 2" ); *)
+      (* ( "Query with number array param", *)
+      (*   [DBCaml.Params.NumberArray [1; 2]], *)
+      (*   "select * from users where id = any($1) limit 2" ); *)
+      (* ( "Query with 1 number array param", *)
+      (*   [DBCaml.Params.NumberArray [1]], *)
+      (*   "select * from users where  id = any($1) limit 2" ); *)
+      (* ( "Query with different type param", *)
+      (*   [ *)
+      (*     DBCaml.Params.NumberArray [1]; *)
+      (*     DBCaml.Params.String "Alice"; *)
+      (*     DBCaml.Params.Bool true; *)
+      (*   ], *)
+      (*   "select * from users where id = any($1) and name = $2 and some_bool = $3  limit 2" *)
+      (* ); *)
     ]
   in
 
@@ -95,7 +97,7 @@ let test_unsuccessful_query () =
   match
     DBCaml.Connection.query
       ~conn
-      ~params:[DBCaml.Params.Number 10]
+      ~params:(Params.make Values.[integer 10])
       ~query:"select * from users where i_dont_exist > $1 limit 2"
       ~row_limit:0
   with

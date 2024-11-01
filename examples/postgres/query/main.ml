@@ -1,4 +1,5 @@
 open Riot
+module Values = DBCaml.Params.Values
 
 open Logger.Make (struct
   let namespace = ["examples"; "basic_postgres"]
@@ -79,7 +80,7 @@ let () =
       db
       ~query:
         "select name, id, some_bool, pet_name, some_int64, some_int32, some_float, pets, pets as pets_array from users where id < $1 limit 2"
-      ~params:[DBCaml.Params.number 3]
+      ~params:Values.[integer 3]
       ~deserializer:deserialize_users
   in
 

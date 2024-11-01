@@ -6,14 +6,13 @@ let assert_ok = function
   | rc ->
     failwith @@ Format.sprintf "SQLITE: Not OK! %s" (Sqlite3.Rc.to_string rc)
 
-let param_to_sqlite (param : DBCaml.Params.t) : Sqlite3.Data.t =
+let param_to_sqlite (type a) (param : a DBCaml.Params.value) : Sqlite3.Data.t =
   match param with
-  | DBCaml.Params.String v -> Sqlite3.Data.TEXT v
-  | DBCaml.Params.Number v -> Sqlite3.Data.INT (Int64.of_int v)
-  | DBCaml.Params.Float v -> Sqlite3.Data.FLOAT v
-  | DBCaml.Params.Bool v -> Sqlite3.Data.opt_bool (Some v)
-  | DBCaml.Params.StringArray _ -> failwith "SQLITE: Not Supported!"
-  | DBCaml.Params.NumberArray _ -> failwith "SQLITE: Not Supported!"
+  | CONST (v, TEXT) -> Sqlite3.Data.TEXT v
+  | CONST (v, INTEGER) -> Sqlite3.Data.INT (Int64.of_int v)
+  | CONST (v, FLOAT) -> Sqlite3.Data.FLOAT v
+  | CONST (v, BOOLEAN) -> Sqlite3.Data.opt_bool (Some v)
+  | _ -> failwith "SQLITE: Not implemented"
 
 let data_to_string (data : Sqlite3.Data.t) : string option =
   Some (Sqlite3.Data.to_string_coerce data)
@@ -34,7 +33,11 @@ module Store = struct
 
   let to_string (store : t) = Yojson.Basic.to_string (`List !store)
 
-  let to_response (store : t) = to_string store |> Bytes.of_string |> Result.ok
+  let to_response (store : t) =
+    let response = to_string store in
+    Fmt.epr "REPONSE: %s\n%!" response;
+
+    response |> Bytes.of_string |> Result.ok
 end
 
 type t = { conninfo: string }
@@ -52,18 +55,21 @@ module T : DBCaml.Driver.DRIVER with type config = t = struct
     let conn = Sqlite3.db_open config.conninfo in
     SqliteLogger.info "Conection complete";
 
-    let query ~connection ~params ~query ~row_limit :
+    let query ~connection ~(params : DBCaml.Params.values) ~query ~row_limit :
         (Bytes.t, DBCaml.Error.t) result =
       SqliteLogger.info (Format.sprintf "Querying database: %s" query);
       let _ = row_limit in
-      match params with
-      | [] -> collect_rows connection query
+      match DBCaml.Params.length params with
+      | 0 -> collect_rows connection query
       | _ ->
         let open Sqlite3 in
         let stmt = prepare connection query in
-        List.iteri
-          (fun idx param ->
-            assert_ok @@ bind stmt (idx + 1) (param_to_sqlite param))
+        DBCaml.Params.iteri
+          {
+            iter =
+              (fun idx param ->
+                assert_ok @@ bind stmt (idx + 1) (param_to_sqlite param));
+          }
           params;
         (* Useful functions for later! *)
         (* (column_decltype stmt i |> Option.get) *)

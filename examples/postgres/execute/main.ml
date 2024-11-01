@@ -1,5 +1,6 @@
 open Riot
 module Params = DBCaml.Params
+module Values = DBCaml.Params.Values
 
 open Logger.Make (struct
   let namespace = ["examples"; "basic_postgres"]
@@ -32,15 +33,18 @@ let () =
     DBCaml.execute
       db
       ~params:
-        [
-          DBCaml.Params.string "Emil";
-          DBCaml.Params.bool true;
-          DBCaml.Params.string "Danza";
-          DBCaml.Params.number 1;
-          DBCaml.Params.number 1;
-          DBCaml.Params.float 1.1;
-          DBCaml.Params.string_list ["Danza"];
-        ]
+        Values.
+          [
+            text "Emil";
+            (* bool true; *)
+            assert false;
+            text "Danza";
+            integer 1;
+            integer 1;
+            float 1.1;
+            (* string_list ["Danza"]; *)
+            assert false;
+          ]
       ~query:
         "insert into users (name, some_bool, pet_name, some_int64, some_int32, some_float, pets) values ($1, $2, $3, $4, $5, $6, $7)"
   in
@@ -49,7 +53,7 @@ let () =
   let* _ =
     DBCaml.execute
       db
-      ~params:[DBCaml.Params.string "Emil"; DBCaml.Params.string "Lowa"]
+      ~params:Values.[text "Emil"; text "Lowa"]
       ~query:"update users set pet_name = $2 where name = $1"
   in
 
@@ -57,7 +61,7 @@ let () =
   let* _ =
     DBCaml.execute
       db
-      ~params:[Params.string "Emil"]
+      ~params:Values.[text "Emil"]
       ~query:"delete from users where name = $1"
   in
 

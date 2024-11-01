@@ -8,7 +8,7 @@ type t =
       conn: 'conn;
       query:
         connection:'conn ->
-        params:Params.t list ->
+        params:Params.values ->
         query:string ->
         row_limit:int ->
         (* TODO: This would probably be good to switch to ExecutionError.t,
