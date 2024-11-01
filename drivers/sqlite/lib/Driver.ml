@@ -6,12 +6,18 @@ let assert_ok = function
   | rc ->
     failwith @@ Format.sprintf "SQLITE: Not OK! %s" (Sqlite3.Rc.to_string rc)
 
-let param_to_sqlite (type a) (param : a DBCaml.Params.value) : Sqlite3.Data.t =
+let rec param_to_sqlite : 'a. 'a DBCaml.Params.value -> Sqlite3.Data.t =
+ fun (type a) (param : a DBCaml.Params.value) ->
   match param with
   | CONST (v, TEXT) -> Sqlite3.Data.TEXT v
   | CONST (v, INTEGER) -> Sqlite3.Data.INT (Int64.of_int v)
   | CONST (v, FLOAT) -> Sqlite3.Data.FLOAT v
   | CONST (v, BOOLEAN) -> Sqlite3.Data.opt_bool (Some v)
+  | CONST (v, NULLABLE ty) -> begin
+    match v with
+    | Some y -> param_to_sqlite (DBCaml.Params.CONST (y, ty))
+    | None -> Sqlite3.Data.NULL
+  end
   | _ -> failwith "SQLITE: Not implemented"
 
 let data_to_string (data : Sqlite3.Data.t) : string option =
