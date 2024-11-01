@@ -66,9 +66,7 @@ module Postgres = struct
     in
 
     let query ~connection ~params ~query ~row_limit =
-      match Executer.query ~conn:connection ~query ~row_limit ~params with
-      | Ok rows as ok -> ok
-      | Error _ as err -> err
+      Executer.query ~conn:connection ~query ~row_limit ~params
     in
 
     (* Create a new connection which we also want to use to create a PID *)

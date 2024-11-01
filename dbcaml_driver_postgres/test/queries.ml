@@ -84,10 +84,11 @@ let test_unsuccessful_query () =
     | Driver { driver = (module DriverModule); config } ->
       (match DriverModule.connect config with
       | Ok e -> Ok e
-      | Error (`msg e) ->
+      | Error e ->
         Alcotest.fail
-          (Printf.sprintf "should be able to start a connection: %S" e)
-      | Error _ -> Alcotest.fail "Should be able to start a connection")
+          (Printf.sprintf
+             "Should be able to start a connection: %S"
+             (DBCaml.Error.show e)))
   in
   let conn = Result.get_ok conn in
 
