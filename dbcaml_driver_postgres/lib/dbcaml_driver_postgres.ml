@@ -59,14 +59,16 @@ module Postgres = struct
         Ok conn
       | mf ->
         Error
-          (`Msg
+          (`msg
             (Printf.sprintf
                "Unexpected message format: %s"
                (Message_format.to_string ~format:mf)))
     in
 
     let query ~connection ~params ~query ~row_limit =
-      Executer.query ~conn:connection ~query ~row_limit ~params
+      match Executer.query ~conn:connection ~query ~row_limit ~params with
+      | Ok rows as ok -> ok
+      | Error _ as err -> err
     in
 
     (* Create a new connection which we also want to use to create a PID *)

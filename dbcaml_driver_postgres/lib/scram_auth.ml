@@ -128,4 +128,4 @@ let authenticate ~conn ~is_plus ~username ~password =
   | true ->
     Pg_logger.debug "SCRAM authentication successful";
     Ok ()
-  | false -> Error (`Msg "Server proof verification failed")
+  | false -> Error (`msg "Server proof verification failed")

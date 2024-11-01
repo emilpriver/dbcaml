@@ -1,13 +1,27 @@
-module ConnectionError = struct
+module RioError = struct
+  type t = (Rio.io_error[@printer Rio.pp_err]) [@@deriving show]
+end
+
+module Connection = struct
+  let pp_exn _ _ = ()
+
   type t =
-    [ `connection_error of string
-    | `authenication_error of string
-    | `general_error of string
+    [ `closed
+    | `connection_closed
+    | `eof
+    | `msg of string
+    | `no_info
+    | `noop
+    | `process_down
+    | `timeout
+    | `would_block
+    | RioError.t
+    | `Exit of exn
     ]
   [@@deriving show]
 end
 
-module ExecutionError = struct
+module Execution = struct
   type t =
     [ `execution_error of string
     | `no_rows
@@ -25,8 +39,8 @@ end
 
 type t =
   [ SerdeError.t
-  | ExecutionError.t
-  | ConnectionError.t
+  | Execution.t
+  | Connection.t
   | `Supervisor_error
   ]
 [@@deriving show]

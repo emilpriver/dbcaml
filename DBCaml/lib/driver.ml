@@ -1,29 +1,14 @@
 open Riot
+open Prelude
 
 open Logger.Make (struct
   let namespace = ["dbcaml"; "connection"]
 end)
 
-let ( let* ) = Result.bind
-
-type connection_errors =
-  [ `Closed
-  | `Connection_closed
-  | `Eof
-  | `Exn of exn
-  | `Msg of string
-  | `No_info
-  | `Noop
-  | `Process_down
-  | `Timeout
-  | `Unix_error of Unix.error
-  | `Would_block
-  ]
-
 module type DRIVER = sig
   type config
 
-  val connect : config -> (Connection.t, [> connection_errors ]) result
+  val connect : config -> (Connection.t, Error.t) result
 
   val deserialize : 'a Serde.De.t -> bytes -> ('a, Serde.error) result
 
@@ -71,16 +56,16 @@ let start_link { connection_manager_pid; driver; requester_pid } =
     | Driver { driver = (module DriverModule); config } ->
       (match DriverModule.connect config with
       | Ok e -> Ok e
-      | Error (`Msg e) ->
+      | Error (`msg e) ->
         send requester_pid (Messages.ConnectionResult (Error e));
-        Error (`Msg e)
-      | Error `Connection_closed
-      | Error `Closed ->
+        Error (`msg e)
+      | Error `connection_closed
+      | Error `closed ->
         send
           requester_pid
           (Messages.ConnectionResult
              (Error "Connection closed, is the database up?"));
-        Error (`Msg "Connection closed, is the database up?")
+        Error (`msg "Connection closed, is the database up?")
       | Error e ->
         send
           requester_pid

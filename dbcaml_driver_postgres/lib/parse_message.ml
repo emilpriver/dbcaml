@@ -64,10 +64,10 @@ let rec parse_response acc message =
       get_message_parts ~message:(String.of_bytes message)
     in
     let error_message = List.assoc 'M' parse_error_message in
-    Error (`Msg error_message)
+    Error (`msg error_message)
   | mt ->
     Error
-      (`Msg
+      (`msg
         (Printf.sprintf
            "unexpected message_type: %S"
            (Message_format.to_string ~format:mt)))

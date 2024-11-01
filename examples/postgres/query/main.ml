@@ -28,7 +28,7 @@ let () =
   Riot.run_with_status ~on_error:(fun _ -> failwith "SCUFFED") @@ fun () ->
   let _ =
     match Logger.start () with
-    | Error (`Msg e) -> failwith e
+    | Error (`msg e) -> failwith e
     | Error `Supervisor_error -> failwith "SUPERVISOR"
     | Error (`Application_error msg) -> failwith msg
     | Ok pid -> pid

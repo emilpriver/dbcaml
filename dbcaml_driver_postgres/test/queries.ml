@@ -49,7 +49,7 @@ let test_queries () =
     | Driver { driver = (module DriverModule); config } ->
       (match DriverModule.connect config with
       | Ok e -> Ok e
-      | Error (`Msg e) ->
+      | Error (`msg e) ->
         Alcotest.fail
           (Printf.sprintf "should be able to start a connection: %S" e)
       | Error _ -> Alcotest.fail "Should be able to start a connection")
@@ -84,7 +84,7 @@ let test_unsuccessful_query () =
     | Driver { driver = (module DriverModule); config } ->
       (match DriverModule.connect config with
       | Ok e -> Ok e
-      | Error (`Msg e) ->
+      | Error (`msg e) ->
         Alcotest.fail
           (Printf.sprintf "should be able to start a connection: %S" e)
       | Error _ -> Alcotest.fail "Should be able to start a connection")
