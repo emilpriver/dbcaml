@@ -36,8 +36,10 @@ jobs:
           wait_timeout: "30"
           migrations_table: "schema_migrations"
           database_url: "postgresql://postgres:postgres@localhost:6432/postgres?sslmode=disable"
-      - run: curl -fsSL https://get.dune.build/install | sh
-      - run: ls -l
+      - name: Download and install dune
+        run: curl -fsSL https://get.dune.build/install | sh
+      - name: Add dune to PATH
+        run: echo "$HOME/.dune/bin" >> "$GITHUB_PATH"
       - name: Build 
         run: /home/runner/.dune/bin/dune build
       - name: Test
