@@ -1,4 +1,6 @@
 open Riot
+module Params = DBCaml.Params
+module Values = DBCaml.Params.Values
 
 open Logger.Make (struct
   let namespace = ["examples"; "basic_postgres"]
@@ -7,7 +9,8 @@ end)
 let ( let* ) = Result.bind
 
 let () =
-  Riot.run_with_status ~on_error:(fun x -> failwith x) @@ fun () ->
+  Riot.run_with_status ~on_error:(fun s -> failwith (DBCaml.Error.show s))
+  @@ fun () ->
   let _ = Logger.start () |> Result.get_ok in
   set_log_level (Some Logger.Debug);
   info (fun f -> f "Starting application");
@@ -15,54 +18,51 @@ let () =
   (* Start the database connection pool *)
   let* db =
     let config =
-      Silo.config
+      DBCaml.config
+        ~connector:(module DBCamlPostgres)
         ~connections:5
-        ~driver:(module Dbcaml_driver_postgres)
         ~connection_string:
           "postgresql://postgres:postgres@localhost:6432/postgres?sslmode=disable"
     in
 
-    Silo.connect ~config
+    DBCaml.connect ~config
   in
 
-  (* Fetch the user and return the user to a variable *)
-  let* rows_affected =
-    Silo.execute
+  (* (* Fetch the user and return the user to a variable *) *)
+  let* _ =
+    DBCaml.execute
       db
       ~params:
-        [
-          Silo.string "Emil";
-          Silo.bool true;
-          Silo.string "Danza";
-          Silo.number 1;
-          Silo.number 1;
-          Silo.float 1.1;
-          Silo.string_list ["Danza"];
-        ]
+        Values.
+          [
+            text "Emil";
+            (* bool true; *)
+            assert false;
+            text "Danza";
+            integer 1;
+            integer 1;
+            float 1.1;
+            (* string_list ["Danza"]; *)
+            assert false;
+          ]
       ~query:
         "insert into users (name, some_bool, pet_name, some_int64, some_int32, some_float, pets) values ($1, $2, $3, $4, $5, $6, $7)"
   in
 
-  let _ = rows_affected in
-
   (* Fetch the user and return the user to a variable *)
-  let* rows_affected =
-    Silo.execute
+  let* _ =
+    DBCaml.execute
       db
-      ~params:[Silo.string "Emil"; Silo.string "Lowa"]
+      ~params:Values.[text "Emil"; text "Lowa"]
       ~query:"update users set pet_name = $2 where name = $1"
   in
 
-  let _ = rows_affected in
-
   (* Fetch the user and return the user to a variable *)
-  let* rows_affected =
-    Silo.execute
+  let* _ =
+    DBCaml.execute
       db
-      ~params:[Silo.string "Emil"]
+      ~params:Values.[text "Emil"]
       ~query:"delete from users where name = $1"
   in
-
-  let _ = rows_affected in
 
   Ok 1

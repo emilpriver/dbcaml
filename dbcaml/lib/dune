@@ -1,4 +1,0 @@
-(library
- (public_name dbcaml)
- (name dbcaml)
- (libraries riot serde uri))

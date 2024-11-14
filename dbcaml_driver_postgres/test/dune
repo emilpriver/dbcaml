@@ -1,4 +1,0 @@
-(test
- (package dbcaml-driver-postgres)
- (name test_suite)
- (libraries riot dbcaml-driver-postgres messages alcotest))

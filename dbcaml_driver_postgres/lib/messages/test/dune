@@ -1,5 +1,0 @@
-(test
- (package dbcaml-driver-postgres)
- (name escape_test)
- (modules escape_test)
- (libraries riot dbcaml-driver-postgres messages alcotest))

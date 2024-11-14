@@ -1,0 +1,14 @@
+(library
+ (name DBCamlPostgres)
+ (public_name DBCamlPostgres)
+ (libraries
+  riot
+  uri
+  DBCaml
+  messages
+  bytestring
+  str
+  tls
+  cryptokit
+  mirage-crypto
+  castore))

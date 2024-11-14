@@ -1,0 +1,5 @@
+(library
+ (public_name DBCaml)
+ (name DBCaml)
+ (libraries riot serde uri)
+ (preprocess (pps ppx_deriving.std)))

@@ -1,0 +1,4 @@
+(library
+ (name messages)
+ (package DBCamlPostgres)
+ (libraries riot DBCaml))

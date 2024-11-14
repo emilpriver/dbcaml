@@ -10,14 +10,7 @@ permissions: read-all
 
 jobs:
   build:
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          - ubuntu-latest
-        ocaml-compiler:
-          - "5.1"
-    runs-on: ${{ matrix.os }}
+    runs-on: "ubuntu-latest"
     services:
       postgres:
         image: postgres:15.6
@@ -36,10 +29,6 @@ jobs:
     steps:
       - name: Checkout tree
         uses: actions/checkout@v4
-      - name: Set-up OCaml ${{ matrix.ocaml-compiler }}
-        uses: ocaml/setup-ocaml@v2
-        with:
-          ocaml-compiler: ${{ matrix.ocaml-compiler }}
       - name: Make migrations
         uses: emilpriver/geni@main
         with:
@@ -47,6 +36,9 @@ jobs:
           wait_timeout: "30"
           migrations_table: "schema_migrations"
           database_url: "postgresql://postgres:postgres@localhost:6432/postgres?sslmode=disable"
-      - run: opam install . --deps-only --with-test
-      - run: opam exec -- dune build
-      - run: opam exec -- dune runtest
+      - name: Download and install dune
+        run: curl -fsSL https://get.dune.build/install | sh
+      - name: Add dune to PATH
+        run: echo "$HOME/.dune/bin" >> "$GITHUB_PATH"
+      - name: Build & run integration tests
+        run: /home/runner/.dune/bin/dune runtest

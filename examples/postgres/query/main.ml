@@ -1,10 +1,11 @@
 open Riot
+module Values = DBCaml.Params.Values
 
 open Logger.Make (struct
   let namespace = ["examples"; "basic_postgres"]
 end)
 
-let ( let* ) = Result.bind
+let ( let* ) = Stdlib.Result.bind
 
 type query_result = int [@@deriving deserialize]
 
@@ -25,10 +26,10 @@ type user = {
 type users = user list [@@deriving deserialize]
 
 let () =
-  Riot.run_with_status ~on_error:(fun x -> failwith x) @@ fun () ->
+  Riot.run_with_status ~on_error:(fun _ -> failwith "SCUFFED") @@ fun () ->
   let _ =
     match Logger.start () with
-    | Error (`Msg e) -> failwith e
+    | Error (`msg e) -> failwith e
     | Error `Supervisor_error -> failwith "SUPERVISOR"
     | Error (`Application_error msg) -> failwith msg
     | Ok pid -> pid
@@ -37,19 +38,19 @@ let () =
   info (fun f -> f "Starting application");
   let* db =
     let config =
-      Silo.config
+      DBCaml.config
+        ~connector:(module DBCamlPostgres)
         ~connections:5
-        ~driver:(module Dbcaml_driver_postgres)
         ~connection_string:
           "postgresql://postgres:postgres@localhost:6432/postgres?sslmode=disable"
     in
 
-    Silo.connect ~config
+    DBCaml.connect ~config
   in
 
   (* Fetch the user and return the user to a variable *)
   let* fetched_users =
-    Silo.query
+    DBCaml.query
       db
       ~query:
         "select name, id, some_bool, pet_name, some_int64, some_int32, some_float, pets, pets as pets_array from users limit 2"
@@ -71,15 +72,15 @@ let () =
         x.some_bool
         (String.concat ", " x.pets)
         (String.concat ", " (Array.to_list x.pets_array)))
-    (Option.get fetched_users);
+    fetched_users;
 
   (* Fetch the user and return the user to a variable *)
   let* fetched_users =
-    Silo.query
+    DBCaml.query
       db
       ~query:
         "select name, id, some_bool, pet_name, some_int64, some_int32, some_float, pets, pets as pets_array from users where id < $1 limit 2"
-      ~params:[Silo.number 3]
+      ~params:Values.[integer 3]
       ~deserializer:deserialize_users
   in
 
@@ -98,7 +99,7 @@ let () =
         x.some_bool
         (String.concat ", " x.pets)
         (String.concat ", " (Array.to_list x.pets_array)))
-    (Option.get fetched_users);
+    fetched_users;
 
   info (fun f -> f "Starting application");
   Ok 1

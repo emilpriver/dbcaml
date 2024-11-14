@@ -1,4 +1,0 @@
-pin-depends: [
-  ["serde.0.0.3" "git+https://github.com/serde-ml/serde"]
-  ["serde_derive.0.0.3" "git+https://github.com/serde-ml/serde"]
-]

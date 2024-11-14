@@ -19,7 +19,7 @@ More information on how DBCaml work exist at [the documentation](https://dbca.ml
 
 Run `opam install . --deps-only` to install the necessary packages.
 
-To install DBCaml, DBCaml postgres driver, Serde postgres and Silo postgres from sources do you need to pin each package:
+To install DBCaml, DBCaml postgres driver, Serde postgres from sources do you need to pin each package:
 
 ```sh
 ; opam pin dbcaml.0.0.3 git+https://github.com/dbcaml/dbcaml
@@ -52,7 +52,7 @@ Running  `docker compose up` should setup the database for you, migrate and add 
 A driver within DBCaml is the thing who actually talking to the database, the main DBCaml is just a interface between the user and the database. The main package do contact the driver to ask it for executing jobs.
 The way for the main package to interact with the driver is that the driver should export a module that hold the type `Driver.t`. 
 
-[Example driver](./dbcaml_driver_postgres)
+[Example driver](./drivers/postgres/)
 
 ## Driver requirements
 
