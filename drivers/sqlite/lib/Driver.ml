@@ -41,8 +41,7 @@ module Store = struct
 
   let to_response (store : t) =
     let response = to_string store in
-    Fmt.epr "REPONSE: %s\n%!" response;
-
+    (* Fmt.epr "REPONSE: %s\n%!" response; *)
     response |> Bytes.of_string |> Result.ok
 end
 
